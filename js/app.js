@@ -545,7 +545,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function closeSelectExerciseModal() {
     modalSelectExercise.classList.remove('active');
-    document.getElementById('custom-exercise-form').style.display = 'none';
   }
 
   document.getElementById('btn-close-exercise-modal')?.addEventListener('click', closeSelectExerciseModal);
@@ -630,16 +629,32 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Custom Exercise Creation Subform
-  document.getElementById('btn-open-create-custom-ex')?.addEventListener('click', () => {
-    const form = document.getElementById('custom-exercise-form');
-    form.style.display = form.style.display === 'none' ? 'block' : 'none';
-  });
+  // Dedicated "Crear Tu Ejercicio" Modal Logic
+  const modalCreateExercise = document.getElementById('modal-create-exercise');
+  const dedicatedExName = document.getElementById('dedicated-ex-name');
+  const dedicatedExMuscle = document.getElementById('dedicated-ex-muscle');
+  const dedicatedExCategory = document.getElementById('dedicated-ex-category');
 
-  document.getElementById('btn-save-new-exercise')?.addEventListener('click', () => {
-    const nameInput = document.getElementById('new-ex-name');
-    const muscleInput = document.getElementById('new-ex-muscle');
-    const name = nameInput.value.trim();
+  function openCreateExerciseModal() {
+    dedicatedExName.value = '';
+    modalCreateExercise.classList.add('active');
+    setTimeout(() => {
+      dedicatedExName.focus();
+    }, 250);
+  }
+
+  function closeCreateExerciseModal() {
+    modalCreateExercise.classList.remove('active');
+  }
+
+  document.getElementById('btn-header-create-ex')?.addEventListener('click', openCreateExerciseModal);
+  document.getElementById('btn-prominent-create-ex')?.addEventListener('click', openCreateExerciseModal);
+  document.getElementById('btn-open-create-ex-from-routines')?.addEventListener('click', openCreateExerciseModal);
+  document.getElementById('btn-close-create-exercise-modal')?.addEventListener('click', closeCreateExerciseModal);
+  document.getElementById('btn-cancel-dedicated-exercise')?.addEventListener('click', closeCreateExerciseModal);
+
+  document.getElementById('btn-submit-dedicated-exercise')?.addEventListener('click', () => {
+    const name = dedicatedExName.value.trim();
     if (!name) {
       alert('Por favor escribe un nombre para el ejercicio.');
       return;
@@ -647,17 +662,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const created = window.storageService.addExercise({
       name: name,
-      muscle: muscleInput.value
+      muscle: dedicatedExMuscle.value,
+      category: dedicatedExCategory.value
     });
 
-    nameInput.value = '';
-    document.getElementById('custom-exercise-form').style.display = 'none';
+    closeCreateExerciseModal();
+    window.soundEngine.playCheck();
 
+    // If an exercise selection was pending in workout, auto-select it!
     if (onExerciseSelectedCallback) {
       onExerciseSelectedCallback(created);
       closeSelectExerciseModal();
     } else {
       renderExercisesLibrary();
+      renderAllRoutines();
+      alert(`¡"${created.name}" agregado a tu catálogo de ejercicios!`);
     }
   });
 

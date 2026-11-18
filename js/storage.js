@@ -19,38 +19,53 @@ const DEFAULT_SETTINGS = {
 };
 
 const DEFAULT_EXERCISES = [
+  // Pierna & Glúteos
+  { id: 'ex_bulgarian_squat', name: 'Sentadilla búlgara con mancuernas', muscle: 'Pierna', category: 'Mancuernas' },
+  { id: 'ex_hip_thrust', name: 'Hip Thrust con barra', muscle: 'Pierna', category: 'Barra' },
+  { id: 'ex_squat', name: 'Sentadilla trasera con barra', muscle: 'Pierna', category: 'Barra' },
+  { id: 'ex_rdl', name: 'Peso muerto rumano (RDL)', muscle: 'Pierna', category: 'Barra' },
+  { id: 'ex_leg_press', name: 'Prensa de piernas 45°', muscle: 'Pierna', category: 'Máquina' },
+  { id: 'ex_hack_squat', name: 'Sentadilla Hack', muscle: 'Pierna', category: 'Máquina' },
+  { id: 'ex_leg_extension', name: 'Extensión de cuádriceps', muscle: 'Pierna', category: 'Máquina' },
+  { id: 'ex_leg_curl', name: 'Curl femoral tumbado', muscle: 'Pierna', category: 'Máquina' },
+  { id: 'ex_abductor', name: 'Abductores en máquina', muscle: 'Pierna', category: 'Máquina' },
+  { id: 'ex_calf_raise', name: 'Elevación de talones (gemelos)', muscle: 'Pierna', category: 'Máquina' },
+
   // Pecho
   { id: 'ex_bench_press', name: 'Press de banca plano (barra)', muscle: 'Pecho', category: 'Barra' },
   { id: 'ex_incline_dumbbell', name: 'Press inclinado con mancuernas', muscle: 'Pecho', category: 'Mancuernas' },
+  { id: 'ex_incline_barbell', name: 'Press inclinado con barra', muscle: 'Pecho', category: 'Barra' },
+  { id: 'ex_chest_press_machine', name: 'Press de pecho en máquina', muscle: 'Pecho', category: 'Máquina' },
   { id: 'ex_cable_crossover', name: 'Aperturas en polea', muscle: 'Pecho', category: 'Polea' },
   { id: 'ex_dips', name: 'Fondos en paralelas', muscle: 'Pecho', category: 'Peso corporal' },
 
   // Hombros
   { id: 'ex_overhead_press', name: 'Press militar (barra)', muscle: 'Hombros', category: 'Barra' },
-  { id: 'ex_lateral_raises', name: 'Elevaciones laterales', muscle: 'Hombros', category: 'Mancuernas' },
-  { id: 'ex_arnold_press', name: 'Press Arnold / Mancuernas', muscle: 'Hombros', category: 'Mancuernas' },
+  { id: 'ex_arnold_press', name: 'Press militar con mancuernas', muscle: 'Hombros', category: 'Mancuernas' },
+  { id: 'ex_lateral_raises', name: 'Elevaciones laterales con mancuernas', muscle: 'Hombros', category: 'Mancuernas' },
+  { id: 'ex_cable_lateral_raise', name: 'Elevaciones laterales en polea', muscle: 'Hombros', category: 'Polea' },
   { id: 'ex_face_pull', name: 'Face Pull / Deltoides posterior', muscle: 'Hombros', category: 'Polea' },
 
   // Espalda
   { id: 'ex_pullups', name: 'Dominadas', muscle: 'Espalda', category: 'Peso corporal' },
   { id: 'ex_barbell_row', name: 'Remo con barra', muscle: 'Espalda', category: 'Barra' },
+  { id: 'ex_dumbbell_row', name: 'Remo unilateral con mancuerna', muscle: 'Espalda', category: 'Mancuernas' },
   { id: 'ex_lat_pulldown', name: 'Jalón al pecho', muscle: 'Espalda', category: 'Máquina' },
-  { id: 'ex_seated_cable_row', name: 'Remo sentado en polea', muscle: 'Espalda', category: 'Polea' },
-  { id: 'ex_deadlift', name: 'Peso muerto', muscle: 'Espalda', category: 'Barra' },
+  { id: 'ex_close_grip_pulldown', name: 'Jalón agarre cerrado / neutro', muscle: 'Espalda', category: 'Máquina' },
+  { id: 'ex_seated_cable_row', name: 'Remo sentado en polea (Gironda)', muscle: 'Espalda', category: 'Polea' },
+  { id: 'ex_deadlift', name: 'Peso muerto convencional', muscle: 'Espalda', category: 'Barra' },
 
-  // Pierna
-  { id: 'ex_squat', name: 'Sentadilla trasera con barra', muscle: 'Pierna', category: 'Barra' },
-  { id: 'ex_leg_press', name: 'Prensa de piernas 45°', muscle: 'Pierna', category: 'Máquina' },
-  { id: 'ex_leg_extension', name: 'Extensión de cuádriceps', muscle: 'Pierna', category: 'Máquina' },
-  { id: 'ex_leg_curl', name: 'Curl femoral tumbado', muscle: 'Pierna', category: 'Máquina' },
-  { id: 'ex_calf_raise', name: 'Elevación de talones', muscle: 'Pierna', category: 'Máquina' },
-
-  // Brazos & Core
+  // Brazos
   { id: 'ex_bicep_curl_bar', name: 'Curl de bíceps con barra', muscle: 'Brazos', category: 'Barra' },
   { id: 'ex_hammer_curl', name: 'Curl martillo con mancuernas', muscle: 'Brazos', category: 'Mancuernas' },
+  { id: 'ex_incline_bicep_curl', name: 'Curl en banco inclinado con mancuernas', muscle: 'Brazos', category: 'Mancuernas' },
   { id: 'ex_tricep_pushdown', name: 'Extensión de tríceps en polea', muscle: 'Brazos', category: 'Polea' },
+  { id: 'ex_overhead_tricep', name: 'Extensión de tríceps tras nuca', muscle: 'Brazos', category: 'Polea' },
   { id: 'ex_skull_crushers', name: 'Press francés', muscle: 'Brazos', category: 'Barra' },
-  { id: 'ex_plank', name: 'Plancha abdominal', muscle: 'Core', category: 'Peso corporal' }
+
+  // Core & Abdomen
+  { id: 'ex_plank', name: 'Plancha abdominal', muscle: 'Core', category: 'Peso corporal' },
+  { id: 'ex_hanging_leg_raise', name: 'Elevación de piernas colgado', muscle: 'Core', category: 'Peso corporal' }
 ];
 
 const DEFAULT_ROUTINES = [
@@ -70,15 +85,17 @@ const DEFAULT_ROUTINES = [
   },
   {
     id: 'rot_pierna',
-    name: 'Pierna & Core',
-    description: 'Fuerza e hipertrofia para cuádriceps, femoral y pantorrilla',
+    name: 'Pierna & Glúteos',
+    description: 'Sentadillas, búlgaras, hip thrust, prensa y femorales',
     exerciseIds: [
       'ex_squat',
+      'ex_bulgarian_squat',
+      'ex_hip_thrust',
+      'ex_rdl',
       'ex_leg_press',
       'ex_leg_curl',
       'ex_leg_extension',
-      'ex_calf_raise',
-      'ex_plank'
+      'ex_calf_raise'
     ]
   },
   {
@@ -116,9 +133,29 @@ class StorageService {
   }
 
   init() {
-    if (!localStorage.getItem(STORAGE_KEYS.EXERCISES)) {
+    const storedExercises = localStorage.getItem(STORAGE_KEYS.EXERCISES);
+    if (!storedExercises) {
       this.saveExercises(DEFAULT_EXERCISES);
+    } else {
+      // Merge any new default exercises into existing list without losing user's custom exercises
+      try {
+        const existing = JSON.parse(storedExercises) || [];
+        const existingIds = new Set(existing.map(e => e.id));
+        let updated = false;
+        DEFAULT_EXERCISES.forEach(defEx => {
+          if (!existingIds.has(defEx.id)) {
+            existing.push(defEx);
+            updated = true;
+          }
+        });
+        if (updated) {
+          this.saveExercises(existing);
+        }
+      } catch (e) {
+        this.saveExercises(DEFAULT_EXERCISES);
+      }
     }
+
     if (!localStorage.getItem(STORAGE_KEYS.ROUTINES)) {
       this.saveRoutines(DEFAULT_ROUTINES);
     }
