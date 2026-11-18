@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>IronTrack - Gym Progress Tracker</title>
+
+  <!-- PWA & Apple iOS Tags -->
+  <meta name="theme-color" content="#0a0c14">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="IronTrack">
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="./icons/favicon.png">
+  <link rel="manifest" href="./manifest.json">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+
+  <!-- Confetti Canvas for Workout Completion -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <div id="app-container">
+    <!-- Top Header -->
+    <header class="app-header">
+      <div class="brand-wrapper">
+        <img src="./icons/icon-192.png" alt="Logo" class="brand-logo">
+        <h1 class="brand-title">IronTrack</h1>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button id="btn-plate-calc" class="header-action-btn" title="Calculadora de discos">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v12"/><path d="M6 12h12"/></svg>
+          <span>Discos</span>
+        </button>
+        <button id="btn-settings" class="header-action-btn" title="Ajustes y Copia">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- ============================================== -->
+    <!-- VIEW 1: WORKOUT (ENTRENAR)                     -->
+    <!-- ============================================== -->
+    <main id="view-workout" class="view-panel active">
+      <!-- State A: No active workout -->
+      <section id="workout-inactive-state">
+        <button id="btn-start-empty-workout" class="btn-primary-hero">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 5v14"/><path d="M18 5v14"/><path d="M2 9v6"/><path d="M22 9v6"/><path d="M6 12h12"/></svg>
+          <span>Comenzar Entrenamiento Libre</span>
+        </button>
+
+        <div class="quick-stats-grid">
+          <div class="stat-pill">
+            <div id="stat-total-workouts" class="stat-value">0</div>
+            <div class="stat-label">Sesiones</div>
+          </div>
+          <div class="stat-pill">
+            <div id="stat-total-volume" class="stat-value">0 kg</div>
+            <div class="stat-label">Volumen Total</div>
+          </div>
+          <div class="stat-pill">
+            <div id="stat-total-prs" class="stat-value">0</div>
+            <div class="stat-label">Récords PR</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/></svg>
+              Tus Rutinas Rápidas
+            </h2>
+            <button id="btn-goto-routines" class="btn-secondary" style="padding: 6px 12px; font-size: 13px;">Ver todas</button>
+          </div>
+          <div id="home-routines-container">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- State B: Active Workout Session Running -->
+      <section id="workout-active-state" style="display: none;">
+        <div class="active-workout-header">
+          <div class="workout-timer-bar">
+            <div class="workout-live-indicator">
+              <span class="live-dot"></span>
+              <span id="active-routine-name" style="font-weight: 700; font-size: 16px;">Entrenamiento</span>
+            </div>
+            <div id="active-workout-timer" class="workout-timer-display">00:00:00</div>
+          </div>
+          <div class="workout-header-btns">
+            <button id="btn-finish-workout" class="btn-finish-workout">Finalizar Entrenamiento</button>
+            <button id="btn-discard-workout" class="btn-cancel-workout">Descartar</button>
+          </div>
+        </div>
+
+        <!-- Exercises in active workout -->
+        <div id="active-exercises-list">
+          <!-- Dynamically populated -->
+        </div>
+
+        <button id="btn-add-exercise-to-workout" class="btn-primary-hero" style="background: var(--bg-secondary); border: 1px solid var(--border-color); color: #fff; box-shadow: none; margin-top: 12px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          <span>Añadir Ejercicio</span>
+        </button>
+      </section>
+    </main>
+
+    <!-- ============================================== -->
+    <!-- VIEW 2: RUTINAS (ROUTINES)                     -->
+    <!-- ============================================== -->
+    <main id="view-routines" class="view-panel">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h2 style="font-size: 20px; font-weight: 800;">Rutinas de Entrenamiento</h2>
+        <button id="btn-create-routine-modal" class="btn-secondary" style="padding: 8px 14px; font-size: 13px; background: var(--accent-blue); color: #fff; border: none;">+ Nueva Rutina</button>
+      </div>
+      <div id="all-routines-container">
+        <!-- Populated via JS -->
+      </div>
+    </main>
+
+    <!-- ============================================== -->
+    <!-- VIEW 3: HISTORIAL (HISTORY)                    -->
+    <!-- ============================================== -->
+    <main id="view-history" class="view-panel">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h2 style="font-size: 20px; font-weight: 800;">Historial de Entrenamientos</h2>
+      </div>
+      <div id="history-container">
+        <!-- Populated via JS -->
+      </div>
+    </main>
+
+    <!-- ============================================== -->
+    <!-- VIEW 4: PROGRESO & RÉCORDS (PROGRESS)          -->
+    <!-- ============================================== -->
+    <main id="view-progress" class="view-panel">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h2 style="font-size: 20px; font-weight: 800;">Tus Récords Personales (PR)</h2>
+      </div>
+
+      <div class="card" style="margin-bottom: 20px;">
+        <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">
+          Cálculo estimado del <strong>1RM (1 Repetition Maximum)</strong> y pesos máximos registrados en tus entrenamientos.
+        </div>
+        <div id="pr-records-list">
+          <!-- Populated via JS -->
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- FLOATING REST TIMER                            -->
+  <!-- ============================================== -->
+  <aside id="rest-timer-bar" class="rest-timer-bar">
+    <div class="rest-timer-info">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-blue);"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <div>
+        <div style="font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Descanso</div>
+        <div id="rest-timer-clock" class="rest-timer-clock">01:30</div>
+      </div>
+    </div>
+    <div class="rest-timer-actions">
+      <button id="btn-timer-plus30" class="rest-pill-btn">+30s</button>
+      <button id="btn-timer-skip" class="rest-pill-btn" style="color: var(--accent-rose);">Saltar</button>
+    </div>
+  </aside>
+
+  <!-- ============================================== -->
+  <!-- BOTTOM TAB BAR (iOS Navigation)                -->
+  <!-- ============================================== -->
+  <nav class="tab-bar">
+    <button class="tab-btn active" data-view="view-workout">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 5v14"/><path d="M18 5v14"/><path d="M2 9v6"/><path d="M22 9v6"/><path d="M6 12h12"/></svg>
+      <span class="tab-label">Entrenar</span>
+    </button>
+    <button class="tab-btn" data-view="view-routines">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      <span class="tab-label">Rutinas</span>
+    </button>
+    <button class="tab-btn" data-view="view-history">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <span class="tab-label">Historial</span>
+    </button>
+    <button class="tab-btn" data-view="view-progress">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+      <span class="tab-label">Progreso</span>
+    </button>
+  </nav>
+
+  <!-- ============================================== -->
+  <!-- MODAL: SELECCIONAR / CREAR EJERCICIO           -->
+  <!-- ============================================== -->
+  <div id="modal-select-exercise" class="modal-overlay">
+    <div class="modal-sheet">
+      <div class="modal-drag-indicator"></div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <h3 class="modal-title" style="margin: 0;">Seleccionar Ejercicio</h3>
+        <button id="btn-close-exercise-modal" class="btn-secondary" style="padding: 4px 10px; font-size: 13px;">Cerrar</button>
+      </div>
+
+      <div class="form-group">
+        <input type="text" id="exercise-search-input" class="form-input" placeholder="Buscar ejercicio (ej. banca, militar, sentadilla)...">
+      </div>
+
+      <div style="display: flex; gap: 6px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 10px;">
+        <button class="filter-muscle-btn rest-pill-btn active" data-muscle="Todos">Todos</button>
+        <button class="filter-muscle-btn rest-pill-btn" data-muscle="Pecho">Pecho</button>
+        <button class="filter-muscle-btn rest-pill-btn" data-muscle="Hombros">Hombros</button>
+        <button class="filter-muscle-btn rest-pill-btn" data-muscle="Espalda">Espalda</button>
+        <button class="filter-muscle-btn rest-pill-btn" data-muscle="Pierna">Pierna</button>
+        <button class="filter-muscle-btn rest-pill-btn" data-muscle="Brazos">Brazos</button>
+      </div>
+
+      <div id="exercises-library-container" style="max-height: 40vh; overflow-y: auto; margin-bottom: 16px;">
+        <!-- Exercise list items -->
+      </div>
+
+      <button id="btn-open-create-custom-ex" class="btn-secondary" style="width: 100%; border-style: dashed;">
+        + Crear nuevo ejercicio personalizado
+      </button>
+
+      <!-- Sub-form to create custom exercise -->
+      <div id="custom-exercise-form" style="display: none; margin-top: 14px; border-top: 1px solid var(--border-color); padding-top: 14px;">
+        <h4 style="font-size: 15px; margin-bottom: 10px;">Nuevo Ejercicio</h4>
+        <div class="form-group">
+          <label class="form-label">Nombre del ejercicio</label>
+          <input type="text" id="new-ex-name" class="form-input" placeholder="ej. Hip Thrust, Remo unilateral...">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Grupo muscular</label>
+          <select id="new-ex-muscle" class="form-select">
+            <option value="Pecho">Pecho</option>
+            <option value="Hombros">Hombros</option>
+            <option value="Espalda">Espalda</option>
+            <option value="Pierna">Pierna</option>
+            <option value="Brazos">Brazos</option>
+            <option value="Core">Core</option>
+            <option value="Cardio">Cardio</option>
+          </select>
+        </div>
+        <button id="btn-save-new-exercise" class="btn-primary-hero" style="padding: 12px; margin: 0; font-size: 14px;">Guardar y Agregar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: CREAR / EDITAR RUTINA                   -->
+  <!-- ============================================== -->
+  <div id="modal-routine-editor" class="modal-overlay">
+    <div class="modal-sheet">
+      <div class="modal-drag-indicator"></div>
+      <h3 id="routine-modal-title" class="modal-title">Nueva Rutina</h3>
+      <div class="form-group">
+        <label class="form-label">Nombre de la Rutina</label>
+        <input type="text" id="routine-input-name" class="form-input" placeholder="ej. Torso Pesado, Día 1...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Descripción (opcional)</label>
+        <input type="text" id="routine-input-desc" class="form-input" placeholder="ej. Enfoque en fuerza y progresión...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Ejercicios incluidos</label>
+        <div id="routine-modal-exercises-selector" style="max-height: 35vh; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 12px; padding: 8px;">
+          <!-- Checkbox list of exercises -->
+        </div>
+      </div>
+      <div style="display: flex; gap: 8px; margin-top: 16px;">
+        <button id="btn-save-routine" class="btn-primary-hero" style="flex: 1; margin: 0; padding: 14px;">Guardar Rutina</button>
+        <button id="btn-cancel-routine" class="btn-secondary">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: CALCULADORA DE DISCOS (PLATE CALCULATOR)-->
+  <!-- ============================================== -->
+  <div id="modal-plate-calculator" class="modal-overlay">
+    <div class="modal-sheet">
+      <div class="modal-drag-indicator"></div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <h3 class="modal-title" style="margin: 0;">Calculadora de Discos</h3>
+        <button id="btn-close-plate-calc" class="btn-secondary" style="padding: 4px 10px; font-size: 13px;">Cerrar</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Peso Objetivo (<span class="unit-label">kg</span>)</label>
+        <input type="number" id="calc-target-weight" class="form-input" value="80" step="2.5" inputmode="decimal">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Peso de la Barra (<span class="unit-label">kg</span>)</label>
+        <select id="calc-bar-weight" class="form-select">
+          <option value="20">Barra Olímpica estándar (20 kg / 45 lbs)</option>
+          <option value="15">Barra Olímpica femenina / técnica (15 kg / 33 lbs)</option>
+          <option value="10">Barra Z / corta (10 kg / 22 lbs)</option>
+        </select>
+      </div>
+      <div class="plate-calculator-result">
+        <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px;">
+          Cargar en <strong>CADA LADO</strong> de la barra:
+        </div>
+        <div id="plate-calc-discs-output" class="plate-diagram">
+          <!-- Discs displayed visually -->
+        </div>
+        <div id="plate-calc-summary" style="font-size: 14px; font-weight: 700; color: #fff; margin-top: 6px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: AJUSTES & COPIA DE SEGURIDAD            -->
+  <!-- ============================================== -->
+  <div id="modal-settings" class="modal-overlay">
+    <div class="modal-sheet">
+      <div class="modal-drag-indicator"></div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 class="modal-title" style="margin: 0;">Ajustes & Datos</h3>
+        <button id="btn-close-settings" class="btn-secondary" style="padding: 4px 10px; font-size: 13px;">Cerrar</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Unidad de Peso</label>
+        <select id="setting-unit" class="form-select">
+          <option value="kg">Kilogramos (kg)</option>
+          <option value="lbs">Libras (lbs)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tiempo de descanso predeterminado (segundos)</label>
+        <select id="setting-rest-time" class="form-select">
+          <option value="60">60 segundos (1:00)</option>
+          <option value="90">90 segundos (1:30)</option>
+          <option value="120">120 segundos (2:00)</option>
+          <option value="180">180 segundos (3:00)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Sonido y Vibración al terminar descanso</label>
+        <div style="display: flex; gap: 12px; margin-top: 6px;">
+          <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #fff;">
+            <input type="checkbox" id="setting-sound" checked> Sonido
+          </label>
+          <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #fff;">
+            <input type="checkbox" id="setting-vibrate" checked> Vibración
+          </label>
+        </div>
+      </div>
+
+      <div style="margin-top: 24px; border-top: 1px solid var(--border-color); padding-top: 16px;">
+        <label class="form-label">Copia de Seguridad (Tus entrenamientos nunca se pierden)</label>
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+          <button id="btn-export-backup" class="btn-secondary" style="flex: 1;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Exportar JSON
+          </button>
+          <button id="btn-import-backup-trigger" class="btn-secondary" style="flex: 1;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Restaurar
+          </button>
+          <input type="file" id="import-backup-file-input" accept=".json" style="display: none;">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: RESUMEN DE ENTRENAMIENTO FINALIZADO     -->
+  <!-- ============================================== -->
+  <div id="modal-workout-summary" class="modal-overlay">
+    <div class="modal-sheet" style="text-align: center;">
+      <div class="modal-drag-indicator"></div>
+      <div style="font-size: 40px; margin-bottom: 8px;">🔥💪</div>
+      <h3 style="font-size: 22px; font-weight: 800; color: #fff; margin-bottom: 6px;">¡Entrenamiento Completado!</h3>
+      <p id="summary-workout-name" style="font-size: 14px; color: var(--accent-emerald); font-weight: 600; margin-bottom: 20px;">Torso</p>
+
+      <div class="quick-stats-grid" style="margin-bottom: 20px;">
+        <div class="stat-pill">
+          <div id="summary-duration" class="stat-value">0m</div>
+          <div class="stat-label">Duración</div>
+        </div>
+        <div class="stat-pill">
+          <div id="summary-volume" class="stat-value">0 kg</div>
+          <div class="stat-label">Volumen</div>
+        </div>
+        <div class="stat-pill">
+          <div id="summary-sets" class="stat-value">0</div>
+          <div class="stat-label">Series</div>
+        </div>
+      </div>
+
+      <div id="summary-prs-container" style="margin-bottom: 20px;">
+        <!-- Populated if PRs broken -->
+      </div>
+
+      <button id="btn-close-summary" class="btn-primary-hero" style="margin: 0; padding: 16px;">
+        Listo, ¡a recuperarse!
+      </button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="./js/storage.js"></script>
+  <script src="./js/audio.js"></script>
+  <script src="./js/app.js"></script>
+  <script>
+    // Register Service Worker for offline PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('IronTrack SW registered:', reg.scope))
+          .catch(err => console.log('IronTrack SW error:', err));
+      });
+    }
+  </script>
+</body>
+</html>
